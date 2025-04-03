@@ -1,12 +1,24 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useState, useRef, useContext } from "react";
+import { appContext } from "../App";
 import "./Register.css";
 export default function Register() {
-  const [users, setUsers] = useState([]);
-  const [user, setUser] = useState({});
+  const { users, setUsers, user, setUser } = useContext(appContext);
+  const [msg, setMsg] = useState();
+  const msgRef = useRef();
+  const Navigate = useNavigate()
   const handleSubmit = () => {
-    setUsers([...users, user]);
+    const found = users.find((value) => value.email === user.email);
+    if (found) {
+      setMsg("User already exists");
+      msgRef.current.style.color = "red";
+    } else {
+      setMsg();
+      setUsers([...users, user]);
+      //setUser({ ...user, name: "", email: "", password: "" });
+      Navigate("/")
+    }
   };
   const handleDelete = (email) => {
     setUsers(users.filter((value) => value.email != email));
@@ -15,9 +27,11 @@ export default function Register() {
     <div className="App-Register-Row">
       <div className="App-Register-Box">
         <h3>Registration Form</h3>
+        <p ref={msgRef}>{msg}</p>
         <p>
           <input
             type="text"
+            value={user.name}
             placeholder="Enter Name"
             onChange={(e) => setUser({ ...user, name: e.target.value })}
           ></input>
@@ -25,6 +39,7 @@ export default function Register() {
         <p>
           <input
             type="text"
+            value={user.email}
             placeholder="Email address"
             onChange={(e) => setUser({ ...user, email: e.target.value })}
           ></input>
@@ -32,6 +47,7 @@ export default function Register() {
         <p>
           <input
             type="password"
+            value={user.password}
             placeholder="New password"
             onChange={(e) => setUser({ ...user, password: e.target.value })}
           ></input>
